@@ -76,3 +76,14 @@ spec:
           - name: docker-build-oci-ta-min
             bundle: quay.io/rhpds/pipeline-docker-build-lab:1.0
             description: Lab-optimized pipeline with tenant resource limits (CPU 300m/500m, Memory 512Mi/1Gi)
+  integrationService:
+    spec:
+      env:
+        - name: DEFAULT_INTEGRATION_RESOLVER
+          value: "git"
+        - name: DEFAULT_INTEGRATION_URL
+          value: "https://github.com/rhpds/konflux-tssc-lab.git"
+        - name: DEFAULT_INTEGRATION_REVISION
+          value: "main"
+        - name: DEFAULT_INTEGRATION_PATH
+          value: "tekton/pipelines/enterprise-contract-low-resources.yaml"
