@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: patch-konflux-public-info
+  namespace: {{ .Values.konflux.namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ .Values.konflux.namespace }}-admin
+      restartPolicy: OnFailure
+      containers:
+      - name: patch-configmap
+        image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          echo "Patching konflux-public-info ConfigMap with integration test defaults..."
+          
+          # Get current info.json
+          INFO_JSON=$(oc get configmap -n konflux-info konflux-public-info -o jsonpath='{.data.info\.json}')
+          
+          # Add integration_test defaults using jq
+          UPDATED_JSON=$(echo "$INFO_JSON" | jq '. + {integrations: (.integrations + {integration_test: {url: "https://github.com/rhpds/konflux-tssc-lab.git", revision: "main", path: "tekton/pipelines/enterprise-contract-low-resources.yaml"}})}')
+          
+          # Create temporary file
+          echo "$UPDATED_JSON" > /tmp/info.json
+          
+          # Patch the ConfigMap
+          oc create configmap konflux-public-info-temp -n konflux-info --from-file=info.json=/tmp/info.json --dry-run=client -o yaml | \
+            oc patch configmap -n konflux-info konflux-public-info --type=merge -p "$(cat -)"
+          
+          echo "Successfully patched konflux-public-info ConfigMap"
