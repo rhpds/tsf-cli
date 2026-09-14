@@ -74,7 +74,7 @@ spec:
         defaultPipelineName: docker-build-oci-ta-min
         pipelines:
         - name: docker-build-oci-ta-min
-          bundle: quay.io/rhpds/pipeline-docker-build-lab@sha256:8d938b9048ea35c4d69de79fef7b9d4b3be19894745b7d0b7c2e8f4a6af5a28d
+          bundle: quay.io/rhpds/pipeline-docker-build-lab@sha256:1bc72781808c96e0bf8032764c767b32e5c9506ce8aa61401c3a026803d3b205
           description: Lab-optimized pipeline with tenant resource limits (CPU 300m/500m, Memory 512Mi/1Gi)
   integrationService:
     spec:
